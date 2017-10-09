@@ -1,8 +1,8 @@
 import os,io
 from PyPDF2 import PdfFileReader,PdfFileWriter,PdfFileMerger
 
-src =r"H:\清代硃卷集成PDF"
-dst =r"C:\Users\ygl\Desktop\扫描"
+src =r"H:\PDF"
+dst =r"C:\Users\pdf"
 
 lis = os.listdir(src)
 
