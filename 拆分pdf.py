@@ -1,6 +1,9 @@
 import os,io
 from PyPDF2 import PdfFileReader,PdfFileWriter,PdfFileMerger
+'''
+文件夹对文件夹，可批量处理
 
+'''
 src =r"H:\PDF"
 dst =r"C:\Users\pdf"
 
