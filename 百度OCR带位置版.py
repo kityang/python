@@ -13,8 +13,8 @@ def drawLine(left,top,width,height):
     
 
 
-src = r"C:\Users\ygl\Desktop\000004原图.jpg"
-excel = xlrd.open_workbook(r"C:\Users\ygl\Desktop\000004.xls")
+src = r"/000004原图.jpg"
+excel = xlrd.open_workbook(r"/000004.xls")
 img = Image.open(src)
 
 drawImg = ImageDraw.Draw(img)
@@ -43,7 +43,7 @@ for i in range(nrows):
 
 img.show()
 
-img.save(r"C:\Users\ygl\Desktop\000005.jpg")
+img.save(r"/000005.jpg")
     
     
     
