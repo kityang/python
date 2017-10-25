@@ -6,7 +6,7 @@
 import os
 import xlrd
 
-excel = xlrd.open_workbook(r"/home/abc/Desktop/test.xls")
+excel = xlrd.open_workbook(r"/home/abc/Desktop/ter.xls")
 txt = open(r"/home/abc/Desktop/dktableresult.txt","w")
 
 sheet = excel.sheets()[0]
@@ -19,6 +19,7 @@ for i in range(0,nrows):
     for j in range(0,ncols):
         line = line +"  "+sheet.cell(i,j).value +"  |"
     txt.write(line.encode("utf8"))
+    txt.write("\n")
 
 txt.close()
 print "转换完毕"
