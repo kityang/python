@@ -1,8 +1,81 @@
-step = 2  #Éè¶¨¡£²½³¤²»±ØÖðÐÐÉ¨Ãè£¬¿É¸ôÐÐ»ò¸ô¶àÐÐ£¬
+step = 2  #è®¾å®šã€‚æ­¥é•¿ä¸å¿…é€è¡Œæ‰«æï¼Œå¯éš”è¡Œæˆ–éš”å¤šè¡Œï¼Œ
 
-def getEdgesHorizen(imgW,imgH,img_arry):# Ë®Æ½Í¼Ïñ£¬»ñµÃ±ß½ç()£¬·µ»ØËÄ¸öÖµ
+
+def isBlank(imgW,imgH,img_arry):      #åˆ¤æ–­å›¾ç‰‡æ˜¯å¦æ˜¯ç©ºç™½å›¾åƒ
+    horizon = 0
+    verticle = 0
+    for H in range(int(imgH/2),int(imgH/2)+1):
+        blackPoint = 0
+        for W in range(imgW):
+            if img_arry[W,H] == 0:
+                blackPoint = blackPoint+1
+        horizon = blackPoint
+        
+    for W in range(int(imgW/2),int(imgW/2)+1):
+        blackPoint = 0
+        for H in range(imgH):
+            if img_arry[W,H] == 0:
+                blackPoint = blackPoint+1
+        verticle = blackPoint
+
+    if horizon ==0 or  verticle ==0:
+        return True
+    else:
+        return False
+
+def getEdges(imgW,imgH,img_arry): #èŽ·å–å››ä¸ªè¾¹ç•Œ,è®¾å®šå››ä¸ªé˜ˆå€¼
+    left = right = top = down =0
+    thresholdLeft = 300
+    thresholdRight = 300
+    thresholdTop = 20
+    thresholdDown = 20
+    
+    
+
+    for W in range(0,int(imgW/4),step): #ä»Žå·¦å‘ä¸­é—´
+        blackPoint = 0
+        for H in range(imgH):
+            if img_arry[W,H] == 0:
+                blackPoint = blackPoint+1
+        if blackPoint > thresholdLeft:
+            left = W
+            break
+    for W in range(imgW-1,int(imgW/2),-step): #ä»Žå³å‘ä¸­é—´
+        blackPoint = 0
+        for H in range(imgH):
+            if img_arry[W,H] == 0:
+                blackPoint = blackPoint+1
+        if blackPoint > thresholdRight:
+            right = W
+            break
+
+    for H in range(30,int(imgH/4),step):   #ä»Žä¸Šå¾€ä¸‹
+        blackPoint = 0
+        for W in range(imgW):
+            if img_arry[W,H] ==0:
+                blackPoint = blackPoint + 1
+        if blackPoint > thresholdTop:
+            top = H
+            break
+
+    for H in range(int(imgH/4*3),imgH,step):   #ä»Žä¸­é—´å¾€ä¸‹
+        blackPoint = 0
+        for W in range(imgW):
+            if img_arry[W,H] ==0:
+                blackPoint = blackPoint + 1
+        if blackPoint < thresholdDown:
+            down = H
+            break
+
+    return (left,right,top-20,down)
+ 
+        
+
+    
+
+def getEdgesHorizen(imgW,imgH,img_arry):# æ°´å¹³å›¾åƒï¼ŒèŽ·å¾—è¾¹ç•Œ()ï¼Œè¿”å›žå››ä¸ªå€¼
     top1 =top2 =top3 =top4 =0
-    threshold = 120              #Éè¶¨ãÐÖµÎª60¸öµã
+    threshold = 120              #è®¾å®šé˜ˆå€¼ä¸º60ä¸ªç‚¹
     center = 0
     H41 = int(imgH/4)
     H42 = int(imgH/2)
@@ -10,7 +83,7 @@ def getEdgesHorizen(imgW,imgH,img_arry):# Ë®Æ½Í¼Ïñ£¬»ñµÃ±ß½ç()£¬·µ»ØËÄ¸öÖµ
 
 
     
-    for H in range(H41,0,-step):   #1/4´¦ÏòÉÏÉ¨Ãè£¬ÖÁ¶¥²¿£¬Í³¼ÆË®Æ½ÏßºÚµã¸öÊý
+    for H in range(H41,0,-step):   #1/4å¤„å‘ä¸Šæ‰«æï¼Œè‡³é¡¶éƒ¨ï¼Œç»Ÿè®¡æ°´å¹³çº¿é»‘ç‚¹ä¸ªæ•°
         blackPoint = 0
         for W in range(imgW):
             if img_arry[W,H] == 0:
@@ -19,7 +92,7 @@ def getEdgesHorizen(imgW,imgH,img_arry):# Ë®Æ½Í¼Ïñ£¬»ñµÃ±ß½ç()£¬·µ»ØËÄ¸öÖµ
             top1 = H
             break
         
-    for H in range(H41,H42,step):    #1/4´¦ÏòÏÂÉ¨Ãè£¬ÖÁ2/4´¦
+    for H in range(H41,H42,step):    #1/4å¤„å‘ä¸‹æ‰«æï¼Œè‡³2/4å¤„
         blackPoint = 0
         for W in range(imgW):
             if img_arry[W,H] == 0:
@@ -28,7 +101,7 @@ def getEdgesHorizen(imgW,imgH,img_arry):# Ë®Æ½Í¼Ïñ£¬»ñµÃ±ß½ç()£¬·µ»ØËÄ¸öÖµ
         if blackPoint <threshold:
             top2 = H
             break
-    for H in range(H43,H42,-step):     #3/4´¦ÏòÉÏÉ¨Ãè£¬ÖÁ2/4´¦
+    for H in range(H43,H42,-step):     #3/4å¤„å‘ä¸Šæ‰«æï¼Œè‡³2/4å¤„
         blackPoint = 0
         for W in range(imgW):
             if img_arry[W,H] == 0:
@@ -37,7 +110,7 @@ def getEdgesHorizen(imgW,imgH,img_arry):# Ë®Æ½Í¼Ïñ£¬»ñµÃ±ß½ç()£¬·µ»ØËÄ¸öÖµ
             top3 = H
             break
 
-    for H in range(H43,imgH,step):   #3/4´¦ÏòÏÂÉ¨Ãè£¬ÖÁµ×²¿
+    for H in range(H43,imgH,step):   #3/4å¤„å‘ä¸‹æ‰«æï¼Œè‡³åº•éƒ¨
         blackPoint = 0
         for W in range(imgW):
             if img_arry[W,H] == 0:
@@ -49,14 +122,13 @@ def getEdgesHorizen(imgW,imgH,img_arry):# Ë®Æ½Í¼Ïñ£¬»ñµÃ±ß½ç()£¬·µ»ØËÄ¸öÖµ
     return(top1,top2,top3,top4)
 
 
-def getEdgesVertical(imgW,imgH,img_arry):   #´¹Ö±Í¼Ïñ»ñÈ¡Á½¸ö±ß½çÖµ£¬
+def getEdgesVertical(imgW,imgH,img_arry):   #åž‚ç›´å›¾åƒèŽ·å–ä¸¤ä¸ªè¾¹ç•Œå€¼ï¼Œ
     threshold = 120
     left = right = 0
 
-    for W in range(int(imgW/4),0,-step):   #´Ó1/4´¦Ïò×óÉ¨Ãè£¬Í³¼Æ´¹Ö±ÏßºÚµã¸öÊý
+    for W in range(int(imgW/4),0,-step):   #ä»Ž1/4å¤„å‘å·¦æ‰«æï¼Œç»Ÿè®¡åž‚ç›´çº¿é»‘ç‚¹ä¸ªæ•°
         blackPoint = 0
         for H in range(imgH):
-           
             if img_arry[W,H] == 0:
                 blackPoint = blackPoint+1
             left = W
@@ -64,10 +136,9 @@ def getEdgesVertical(imgW,imgH,img_arry):   #´¹Ö±Í¼Ïñ»ñÈ¡Á½¸ö±ß½çÖµ£¬
             break
         
 
-    for W in range(int(imgW/4*3),imgW,step): #´Ó3/4´¦ÏòÓÒÉ¨Ãè£¬Í³¼Æ´¹Ö±ÏßºÚµã¸öÊý
+    for W in range(int(imgW/4*3),imgW,step): #ä»Ž3/4å¤„å‘å³æ‰«æï¼Œç»Ÿè®¡åž‚ç›´çº¿é»‘ç‚¹ä¸ªæ•°
         blackPoint = 0
         for H in range(imgH):
-            
             if img_arry[W,H] == 0:
                 blackPoint = blackPoint+1
         if blackPoint <threshold:
