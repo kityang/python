@@ -1,13 +1,7 @@
-#coding:cp936
-'''
-Ãª¶¨1/4,ÏòÉÏÏòÏÂºáÏòÉ¨Ãè£¬Ò»µ©Ã¿ĞĞµÄºÚµãÊıÁ¿µÍÓÚãĞÖµ£¬±ê¼ÇÎª±ß½ç£¬Í£Ö¹
-Ãª¶¨3/4,ÏòÉÏÏòÏÂºáÏòÉ¨Ãè£¬Ò»µ©Ã¿ĞĞµÄºÚµãÊıÁ¿µÍÓÚãĞÖµ£¬±ê¼ÇÎª±ß½ç£¬Í£Ö¹
-×ªÎª»Ò¶ÈÍ¼ºó£¬Éè¶¨ãĞÖµÎª100£¬×ªÎª¶şÖµ
-'''
+ï»¿
 import os,gc
 from PIL import Image,ImageFilter
-import my_imge                   #×Ô¶¨ÒåÄ£¿é£¬ÔÚ´Ë½Å±¾Í¬ÎÄ¼ş¼ĞÏÂ
-
+import my_imge        #è‡ªå®šä¹‰æ¨¡å—ï¼Œåœ¨æ­¤è„šæœ¬åŒæ–‡ä»¶å¤¹ä¸‹
 
 
 def img_cut(src,dst,i):
@@ -20,85 +14,42 @@ def img_cut(src,dst,i):
     img_arry = img.load()
     imgW,imgH = img.size
 
-
-    threshold = 120              
-    center = 0
+    edge = my_imge.getEdgesByTH(imgW,imgH,img_arry)
     
-    for H in range(int(imgH/2),int(imgH/2)+1):
-        blackPoint = 0
-        for W in range(imgW):
-            if img_arry[W,H] == 0:
-                blackPoint = blackPoint+1
-                
-        center = blackPoint
+    box = (edge[0],edge[2],edge[1],edge[3])
+
+    srcimg = Image.open(srcimgpath).convert("1")
+    img = srcimg.crop(box)
+    img.save(os.path.join(dst,name+".png"))
     
-    
-    if center<=120:
-        tops = my_imge.getEdgesHorizen(imgW,imgH,img_arry)
-        box1 = (0,tops[0],imgW,tops[1])
-        box2 = (0,tops[2],imgW,tops[3])
-
-        H1 = (tops[1]-tops[0])
-        H2 = (tops[3]-tops[2])
-
-        srcimg = Image.open(srcimgpath).convert("L")
-        img1 = srcimg.crop(box1).resize((int(imgW/2),int(H1/2)))
-        img2 = srcimg.crop(box2).resize((int(imgW/2),int(H2/2)))
-        
-        threshold2 = 100
-        table = []
-        for j in range(256):
-            if j < threshold2:
-                table.append(0)
-            else:
-                table.append(1)
-
-        imgpng1 = img1.point(table, '1')
-        imgpng2 = img2.point(table, '1')
-
-        imgpng1.save(os.path.join(dst,name+"_1.png"))
-        imgpng2.save(os.path.join(dst,name+"_2.png"))
-        print(center+"Ë®Æ½",dst,i)
-    else:
-        leftright = my_imge.getEdgesVertical(imgW,imgH,img_arry)
-        
-        box = (leftright[0],0,leftright[1],imgH)
-        
-        w2 = leftright[1]-leftright[0]
-        srcimg = Image.open(srcimgpath).convert("L")
-        img1 = srcimg.crop(box).resize((int(w2/2),int(imgH/2)))
-        threshold2 = 100
-        table = []
-        for j in range(256):
-            if j < threshold2:
-                table.append(0)
-            else:
-                table.append(1)
-
-        imgpng1 = img1.point(table, '1')
-        imgpng1.save(os.path.join(dst,name+"_1.png"))
-        print (center+"´¹Ö±",dst,i)
 
 
 
 
-source  = r"/media/abc/Ò»¸öÂ¿/dunhuangsrc/"
-dest = r"/media/abc/Ò»¸öÂ¿/dunhuangresult"
-txt = open(r"/media/abc/Ò»¸öÂ¿/dunhuangresult/¶Ø»ÍÇĞÍ¼log1.txt",'w')
+source  = r"C:\Users\cbs-shenzhou-001\Desktop\æ°¸ä¹åŒ—è—æ‹†å›¾\æ°¸ä¹åŒ—è—åŸå§‹"
+dest = r"C:\Users\cbs-shenzhou-001\Desktop\æ°¸ä¹åŒ—è—æ‹†å›¾\æ°¸ä¹åŒ—è—åˆ‡å›¾"
+txt_all = open(r"C:\Users\cbs-shenzhou-001\Desktop\æ°¸ä¹åŒ—è—æ‹†å›¾\log1.txt",'w')
+txt_blank = open(r"C:\Users\cbs-shenzhou-001\Desktop\æ°¸ä¹åŒ—è—æ‹†å›¾\ç©ºç™½é¡µ.txt",'w')
 
 for dirs in os.listdir(source):
     srcdirpath = os.path.join(source,dirs)
     dstdirpath = os.path.join(dest,dirs)
+    if not os.path.exists(dstdirpath):
+        os.makedirs(dstdirpath)
 
     for img in os.listdir(srcdirpath):
         imgpath = os.path.join(srcdirpath,img)
-        txt.write("%s\n"%(imgpath))
+        txt_all.write("%s\n"%(imgpath))
+        print (img)
         img_cut(srcdirpath,dstdirpath,img)
         gc.collect()
 
+    print (srcdirpath)
 
     
-    
+txt_all.close()
+txt_blank.close()
+
     
     
       

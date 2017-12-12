@@ -1,3 +1,5 @@
+﻿
+
 step = 2  #设定。步长不必逐行扫描，可隔行或隔多行，
 
 
@@ -18,21 +20,21 @@ def isBlank(imgW,imgH,img_arry):      #判断图片是否是空白图像
                 blackPoint = blackPoint+1
         verticle = blackPoint
 
-    if horizon ==0 or  verticle ==0:
+    if horizon <=20 or  verticle <=20:
         return True
     else:
         return False
 
 def getEdges(imgW,imgH,img_arry): #获取四个边界,设定四个阈值
     left = right = top = down =0
-    thresholdLeft = 300
-    thresholdRight = 300
-    thresholdTop = 20
-    thresholdDown = 20
+    thresholdLeft = 450
+    thresholdRight = 450
+    thresholdTop = int(imgW*0.5)
+    thresholdDown = int(imgW*0.5)
     
     
 
-    for W in range(0,int(imgW/4),step): #从左向中间
+    for W in range(30,int(imgW/2),step): #从左向中间
         blackPoint = 0
         for H in range(imgH):
             if img_arry[W,H] == 0:
@@ -40,7 +42,7 @@ def getEdges(imgW,imgH,img_arry): #获取四个边界,设定四个阈值
         if blackPoint > thresholdLeft:
             left = W
             break
-    for W in range(imgW-1,int(imgW/2),-step): #从右向中间
+    for W in range(imgW-100,int(imgW/4*3),-step): #从右向中间
         blackPoint = 0
         for H in range(imgH):
             if img_arry[W,H] == 0:
@@ -58,92 +60,112 @@ def getEdges(imgW,imgH,img_arry): #获取四个边界,设定四个阈值
             top = H
             break
 
-    for H in range(int(imgH/4*3),imgH,step):   #从中间往下
+    for H in range(imgH-100,int(imgH/4*3),-step):   #从下往
         blackPoint = 0
         for W in range(imgW):
             if img_arry[W,H] ==0:
                 blackPoint = blackPoint + 1
-        if blackPoint < thresholdDown:
+        if blackPoint > thresholdDown:
             down = H
             break
 
-    return (left,right,top-20,down)
+    return (left,right,top,down)
  
         
+def getEdgesByTH(imgW,imgH,img_arry):
 
+    left_cut = 0
+    right_cut = 10
+    top_cut = 0
+    down_cut = 10
     
+    bktopls =[]
+    for W in range(0,int(imgW/4)):
+        bk = 0
+        for H in range(imgH):
+            if img_arry[W,H]==0:
+                bk = bk+1
+        bktopls.append(bk)
+    for i in range(100,len(bktopls)):
+        avg = 0
+        if bktopls[i] >10:
+            a1 = bktopls[i]
+            a2 = bktopls[i+1]
+            a3 = bktopls[i+2]
+            a4 = bktopls[i+3]
+            a5 = bktopls[i+4]
+            avg =((a1+a2+a3+a4+a5)/5)
+            if 10<avg:
+                if avg<100:
+                    left_cut = i+70
+                else:
+                    left_cut = i+30
+                break
 
-def getEdgesHorizen(imgW,imgH,img_arry):# 水平图像，获得边界()，返回四个值
-    top1 =top2 =top3 =top4 =0
-    threshold = 120              #设定阈值为60个点
-    center = 0
-    H41 = int(imgH/4)
-    H42 = int(imgH/2)
-    H43 = int(imgH*3/4)
 
+    bktoplsR =[]
+    for W in range(imgW-100,int(imgW/2+10),-1):
+        bk = 0
+        for H in range(imgH):
+            if img_arry[W,H]==0:
+                bk = bk+1
 
+        bktoplsR.append((bk,W))
     
-    for H in range(H41,0,-step):   #1/4处向上扫描，至顶部，统计水平线黑点个数
-        blackPoint = 0
-        for W in range(imgW):
-            if img_arry[W,H] == 0:
-                blackPoint = blackPoint+1
-        if blackPoint <threshold:
-            top1 = H
-            break
-        
-    for H in range(H41,H42,step):    #1/4处向下扫描，至2/4处
-        blackPoint = 0
-        for W in range(imgW):
-            if img_arry[W,H] == 0:
-                blackPoint = blackPoint+1
+    for i in range(0,len(bktoplsR)):
+        avg = 0
+        if bktoplsR[i][0] >10:
+            a1 = bktoplsR[i][0]
+            a2 = bktoplsR[i+1][0]
+            a3 = bktoplsR[i+2][0]
+            a4 = bktoplsR[i+3][0]
+            a5 = bktoplsR[i+4][0]
+            avg =((a1+a2+a3+a4+a5)/5)
+            if 10<avg:
+                if avg<100:
+                    right_cut = bktoplsR[i][1]-70
+                else:
+                    right_cut = bktoplsR[i][1]-30
+                break
        
-        if blackPoint <threshold:
-            top2 = H
-            break
-    for H in range(H43,H42,-step):     #3/4处向上扫描，至2/4处
-        blackPoint = 0
+                  
+    for H in range(30,int(imgH/4)):
+        bk = 0
         for W in range(imgW):
-            if img_arry[W,H] == 0:
-                blackPoint = blackPoint+1
-        if blackPoint <threshold:
-            top3 = H
+            if img_arry[W,H]==0:
+                bk = bk+1
+        if bk >100:
+            top_cut = H+40
             break
-
-    for H in range(H43,imgH,step):   #3/4处向下扫描，至底部
-        blackPoint = 0
+    for H in range(imgH-5,int(imgH/4*3),-1):
+        bk = 0
         for W in range(imgW):
-            if img_arry[W,H] == 0:
-                blackPoint = blackPoint+1
-        if blackPoint <threshold:
-            top4 = H
+            if img_arry[W,H]==0:
+                bk = bk+1
+        if bk >100:
+            down_cut = H-35
             break
 
-    return(top1,top2,top3,top4)
+    return(left_cut,right_cut,top_cut,down_cut)
 
 
-def getEdgesVertical(imgW,imgH,img_arry):   #垂直图像获取两个边界值，
-    threshold = 120
-    left = right = 0
 
-    for W in range(int(imgW/4),0,-step):   #从1/4处向左扫描，统计垂直线黑点个数
-        blackPoint = 0
-        for H in range(imgH):
-            if img_arry[W,H] == 0:
-                blackPoint = blackPoint+1
-            left = W
-        if blackPoint <threshold:
-            break
-        
 
-    for W in range(int(imgW/4*3),imgW,step): #从3/4处向右扫描，统计垂直线黑点个数
-        blackPoint = 0
-        for H in range(imgH):
-            if img_arry[W,H] == 0:
-                blackPoint = blackPoint+1
-        if blackPoint <threshold:
-            right = W
-            break
 
-    return(left,right)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
